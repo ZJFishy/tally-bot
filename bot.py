@@ -19,6 +19,15 @@ DATA_FILEPATH = "./data.json"
 async def on_ready():
     print(f"We have logged in as {client.user}")
 
+@client.event
+async def on_guild_join(guild):
+    with open(DATA_FILEPATH, "r", encoding="utf-8") as file_in:
+        db = json.load(file_in)
+    if not guild.id in db:
+        db[guild.id] = {}
+        with open(DATA_FILEPATH, "w", encoding="utf-8") as file_out:
+            json.dump(db, file_out)
+
 @client.command()
 async def start_tally(ctx, name: str, start_count: int = 0):
     with open(DATA_FILEPATH, "r", encoding="utf-8") as file_in:
