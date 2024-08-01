@@ -17,7 +17,6 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_KEY }}
         script: |
-            cd /home
-            git config --global --add safe.directory /home
             git checkout master
             git pull origin master --allow-unrelated-histories
+            python3 main.py &
