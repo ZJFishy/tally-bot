@@ -36,7 +36,7 @@ async def start_tally(ctx, name: str, start_count: int = 0):
         await ctx.send(
             f'{name} tally already exists, with a count of {db[ctx.guild.id][name][0]}')
     else:
-        db[ctx.guild.id][name] = (start_count, [])
+        db[ctx.guild.id][name] = (start_count, ["UNKNOWN" for _ in range(start_count)])
         with open(DATA_FILEPATH, "w", encoding="utf-8") as file_out:
             json.dump(db, file_out)
         await ctx.send(f'{name} tally created with a count of {start_count}')
@@ -48,6 +48,8 @@ async def update_count(ctx, name: str, count: int):
         db = json.load(file_in)
     if name in db[ctx.guild.id]:
         dates = db[ctx.guild.id][name][1]
+        while count > db[ctx.guild.id][name][0] + 1:
+            dates.append("UNKNOWN")
         dates.append(datetime.datetime.now().strftime(DT_FORMAT))
         db[ctx.guild.id][name] = (count, dates)
         with open(DATA_FILEPATH, "w", encoding="utf-8") as file_out:
@@ -130,9 +132,14 @@ async def last_inc(ctx, name: str):
                 f"{name} tally has a count of {count}, but no associated dates"
             )
         else:
-            await ctx.send(
-                f"{name} tally was last updated {humanfriendly.format_timespan(datetime.datetime.now() - datetime.datetime.strptime(dates[-1], DT_FORMAT))} ago"
-            )
+            try:
+                await ctx.send(
+                    f"{name} tally was last updated {humanfriendly.format_timespan(datetime.datetime.now() - datetime.datetime.strptime(dates[-1], DT_FORMAT))} ago"
+                )
+            except:
+                await ctx.send(
+                    f"{name} tally was last updated an unknown amount of time ago"
+                )
     else:
         await ctx.send(DNE_MESSAGE)
 
