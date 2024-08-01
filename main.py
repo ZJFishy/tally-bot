@@ -4,36 +4,6 @@ import discord
 import humanfriendly
 from google.cloud import secretmanager
 from discord.ext import commands
-import signal
-import sys
-from types import FrameType
-
-from flask import Flask
-
-from utils.logging import logger
-
-app = Flask(__name__)
-
-@app.route("/")
-def hello() -> str:
-    # Use basic logging with custom fields
-    logger.info(logField="custom-entry", arbitraryField="custom-entry")
-
-    # https://cloud.google.com/run/docs/logging#correlate-logs
-    logger.info("Child logger with trace Id.")
-
-    return "Hello, World!"
-
-
-def shutdown_handler(signal_int: int, frame: FrameType) -> None:
-    logger.info(f"Caught Signal {signal.strsignal(signal_int)}")
-
-    from utils.logging import flush
-
-    flush()
-
-    # Safely exit program
-    sys.exit(0)
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -172,16 +142,3 @@ async def last_inc(ctx, name: str):
                 )
     else:
         await ctx.send(DNE_MESSAGE)
-
-if __name__ == "__main__":
-    # Running application locally, outside of a Google Cloud Environment
-
-    # handles Ctrl-C termination
-    signal.signal(signal.SIGINT, shutdown_handler)
-
-    app.run(host="localhost", port=8080, debug=True)
-    sm_client = secretmanager.SecretManagerServiceClient()
-    client.run(token=sm_client.access_secret_version(request={"name":"projects/59510040058/secrets/bot-token/versions/1"}).payload.data.decode())
-else:
-    # handles Cloud Run container termination
-    signal.signal(signal.SIGTERM, shutdown_handler)
