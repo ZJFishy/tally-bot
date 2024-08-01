@@ -142,3 +142,6 @@ async def last_inc(ctx, name: str):
                 )
     else:
         await ctx.send(DNE_MESSAGE)
+
+sm_client = secretmanager.SecretManagerServiceClient()
+client.run(token=sm_client.access_secret_version(request={"name":"projects/59510040058/secrets/bot-token/versions/1"}).payload.data.decode())
