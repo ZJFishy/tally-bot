@@ -32,11 +32,11 @@ async def on_guild_join(guild):
 async def start_tally(ctx, name: str, start_count: int = 0):
     with open(DATA_FILEPATH, "r", encoding="utf-8") as file_in:
         db = json.load(file_in)
-    if name in db[ctx.guild.id]:
+    if name in db[str(ctx.guild.id)]:
         await ctx.send(
-            f'{name} tally already exists, with a count of {db[ctx.guild.id][name][0]}')
+            f'{name} tally already exists, with a count of {db[str(ctx.guild.id)][name][0]}')
     else:
-        db[ctx.guild.id][name] = (start_count, ["UNKNOWN" for _ in range(start_count)])
+        db[str(ctx.guild.id)][name] = (start_count, ["UNKNOWN" for _ in range(start_count)])
         with open(DATA_FILEPATH, "w", encoding="utf-8") as file_out:
             json.dump(db, file_out)
         await ctx.send(f'{name} tally created with a count of {start_count}')
@@ -46,12 +46,12 @@ async def start_tally(ctx, name: str, start_count: int = 0):
 async def update_count(ctx, name: str, count: int):
     with open(DATA_FILEPATH, "r", encoding="utf-8") as file_in:
         db = json.load(file_in)
-    if name in db[ctx.guild.id]:
-        dates = db[ctx.guild.id][name][1]
-        while count > db[ctx.guild.id][name][0] + 1:
+    if name in db[str(ctx.guild.id)]:
+        dates = db[str(ctx.guild.id)][name][1]
+        while count > db[str(ctx.guild.id)][name][0] + 1:
             dates.append("UNKNOWN")
         dates.append(datetime.datetime.now().strftime(DT_FORMAT))
-        db[ctx.guild.id][name] = (count, dates)
+        db[str(ctx.guild.id)][name] = (count, dates)
         with open(DATA_FILEPATH, "w", encoding="utf-8") as file_out:
             json.dump(db, file_out)
         await ctx.send(f"{name} tally updated to a count of {count}")
@@ -63,10 +63,10 @@ async def update_count(ctx, name: str, count: int):
 async def inc(ctx, add: int, name: str):
     with open(DATA_FILEPATH, "r", encoding="utf-8") as file_in:
         db = json.load(file_in)
-    if name in db[ctx.guild.id]:
-        count, dates = db[ctx.guild.id][name]
+    if name in db[str(ctx.guild.id)]:
+        count, dates = db[str(ctx.guild.id)][name]
         dates.append(datetime.datetime.now().strftime(DT_FORMAT))
-        db[ctx.guild.id][name] = (count + add, dates)
+        db[str(ctx.guild.id)][name] = (count + add, dates)
         with open(DATA_FILEPATH, "w", encoding="utf-8") as file_out:
             json.dump(db, file_out)
         await ctx.send(f"{name} tally increased to a count of {count + add}")
@@ -78,11 +78,11 @@ async def inc(ctx, add: int, name: str):
 async def dec(ctx, remove: int, name: str):
     with open(DATA_FILEPATH, "r", encoding="utf-8") as file_in:
         db = json.load(file_in)
-    if name in db[ctx.guild.id]:
-        count, dates = db[ctx.guild.id][name]
+    if name in db[str(ctx.guild.id)]:
+        count, dates = db[str(ctx.guild.id)][name]
         for _ in range(remove):
             dates.pop(-1)
-        db[ctx.guild.id][name] = (count - remove, dates)
+        db[str(ctx.guild.id)][name] = (count - remove, dates)
         with open(DATA_FILEPATH, "w", encoding="utf-8") as file_out:
             json.dump(db, file_out)
         await ctx.send(f"{name} tally decreased to a count of {count - remove}")
@@ -94,8 +94,8 @@ async def dec(ctx, remove: int, name: str):
 async def check_tally(ctx, name: str):
     with open(DATA_FILEPATH, "r", encoding="utf-8") as file_in:
         db = json.load(file_in)
-    if name in db[ctx.guild.id]:
-        count, dates = db[ctx.guild.id][name]
+    if name in db[str(ctx.guild.id)]:
+        count, dates = db[str(ctx.guild.id)][name]
         if len(dates) == 0:
             await ctx.send(f"{name} tally has a count of {count}")
         else:
@@ -110,8 +110,8 @@ async def check_tally(ctx, name: str):
 async def delete_tally(ctx, name: str):
     with open(DATA_FILEPATH, "r", encoding="utf-8") as file_in:
         db = json.load(file_in)
-    if name in db[ctx.guild.id]:
-        del db[ctx.guild.id][name]
+    if name in db[str(ctx.guild.id)]:
+        del db[str(ctx.guild.id)][name]
         with open(DATA_FILEPATH, "w", encoding="utf-8") as file_out:
             json.dump(db, file_out)
         await ctx.send(f"{name} tally deleted")
@@ -123,8 +123,8 @@ async def delete_tally(ctx, name: str):
 async def last_inc(ctx, name: str):
     with open(DATA_FILEPATH, "r", encoding="utf-8") as file_in:
         db = json.load(file_in)
-    if name in db[ctx.guild.id]:
-        count, dates = db[ctx.guild.id][name]
+    if name in db[str(ctx.guild.id)]:
+        count, dates = db[str(ctx.guild.id)][name]
         if count == 0:
             await ctx.send(f"{name} tally has no count")
         elif len(dates) == 0:
