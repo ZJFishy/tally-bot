@@ -17,6 +17,7 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_KEY }}
         script: |
-            git checkout master
-            git pull origin master --allow-unrelated-histories
+            git checkout main
+            git pull origin main --allow-unrelated-histories
+            pip install -r requirements.txt
             python3 main.py &
