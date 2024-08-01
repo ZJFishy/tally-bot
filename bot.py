@@ -24,7 +24,7 @@ async def on_guild_join(guild):
     with open(DATA_FILEPATH, "r", encoding="utf-8") as file_in:
         db = json.load(file_in)
     if not str(guild.id) in db:
-        db[guild.id] = {}
+        db[str(guild.id)] = {}
         with open(DATA_FILEPATH, "w", encoding="utf-8") as file_out:
             json.dump(db, file_out)
 
